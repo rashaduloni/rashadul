@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S.M. Rashadul Islam - Cyber Portfolio</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        /* Custom modern styles */
+        :root {
+            --primary: #00ff88;
+            --secondary: #1e40af;
+            --bg-dark: #0f172a;
+            --bg-light: #f8fafc;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        body.dark {
+            background: var(--bg-dark);
+            color: var(--bg-light);
+        }
+        .navbar {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .hero {
+            background: linear-gradient(45deg, var(--secondary), #4f46e5);
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+        }
+        .card {
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        .card:hover::before {
+            left: 100%;
+        }
+        .animate-slide-in {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease-out;
+        }
+        .animate-slide-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .skill-progress {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .skill-progress-bar {
+            height: 100%;
+            background: var(--primary);
+            transition: width 1s ease-in-out;
+        }
+        .mode-toggle {
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .mode-toggle:hover {
+            transform: rotate(20deg);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation Bar -->
+    <nav class="navbar fixed top-0 w-full z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-white">S.M. Rashadul Islam</a>
+            <div class="flex items-center space-x-6">
+                <a href="#about" class="text-white hover:text-[var(--primary)] transition">About</a>
+                <a href="#skills" class="text-white hover:text-[var(--primary)] transition">Skills</a>
+                <a href="#experience" class="text-white hover:text-[var(--primary)] transition">Experience</a>
+                <a href="#projects" class="text-white hover:text-[var(--primary)] transition">Projects</a>
+                <a href="#contact" class="text-white hover:text-[var(--primary)] transition">Contact</a>
+                <i class="fas fa-moon text-white text-xl mode-toggle" id="modeToggle"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header id="hero" class="hero text-white text-center pt-32 pb-48">
+        <div class="container mx-auto px-4">
+            <h1 class="text-6xl font-extrabold mb-4 animate-slide-in">S.M. Rashadul Islam</h1>
+            <p class="text-2xl mb-8 font-light">Cyber Security Specialist | Network Architect | System Innovator</p>
+            <a href="#contact" class="bg-[var(--primary)] text-black px-8 py-3 rounded-full font-semibold hover:bg-green-300 transition">Connect with Me</a>
+        </div>
+    </header>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-white dark:bg-[var(--bg-dark)]">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-white">Who Am I</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div class="card bg-gray-100 dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                    <p class="text-gray-700 dark:text-gray-300 leading-relaxed">I am S.M. Rashadul Islam, a Cyber Security and Network Engineer with over 7 years of experience crafting secure, scalable, and innovative IT solutions. My passion drives me to tackle complex challenges and deliver cutting-edge systems for businesses worldwide.</p>
+                </div>
+                <div class="card bg-gray-100 dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                    <p class="text-gray-700 dark:text-gray-300 leading-relaxed">Specializing in network architecture, security protocols, and IT consulting, I have led high-impact projects with expertise in advanced tools and technologies. Currently, I’m pursuing a Master’s in Cyber Security and Forensic Information Technology at the University of Portsmouth, pushing the boundaries of digital innovation.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="py-20 bg-gray-100 dark:bg-gray-900">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-white">Expertise</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                    <h3 class="text-2xl font-semibold mb-6 text-[var(--secondary)] dark:text-[var(--primary)]">Network Architecture</h3>
+                    <ul class="space-y-4 text-gray-700 dark:text-gray-300">
+                        <li><span class="font-medium">Routers:</span> Cisco, Juniper, MikroTik <div class="skill-progress"><div class="skill-progress-bar w-[90%]"></div></div></li>
+                        <li><span class="font-medium">Switches:</span> Cisco, Juniper, Netgear <div class="skill-progress"><div class="skill-progress-bar w-[85%]"></div></div></li>
+                        <li><span class="font-medium">Firewalls:</span> Cisco, Sophos <div class="skill-progress"><div class="skill-progress-bar w-[80%]"></div></div></li>
+                        <li><span class="font-medium">Security:</span> Network Troubleshooting <div class="skill-progress"><div class="skill-progress-bar w-[95%]"></div></div></li>
+                    </ul>
+                </div>
+                <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                    <h3 class="text-2xl font-semibold mb-6 text-[var(--secondary)] dark:text-[var(--primary)]">System Administration</h3>
+                    <ul class="space-y-4 text-gray-700 dark:text-gray-300">
+                        <li><span class="font-medium">Servers:</span> Windows & Linux <div class="skill-progress"><div class="skill-progress-bar w-[90%]"></div></div></li>
+                        <li><span class="font-medium">Databases:</span> SQL, MySQL <div class="skill-progress"><div class="skill-progress-bar w-[85%]"></div></div></li>
+                        <li><span class="font-medium">Cloud:</span> AWS Solutions <div class="skill-progress"><div class="skill-progress-bar w-[80%]"></div></div></li>
+                        <li><span class="font-medium">Virtualization:</span> Data Center Management <div class="skill-progress"><div class="skill-progress-bar w-[90%]"></div></div></li>
+                    </ul>
+                </div>
+                <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                    <h3 class="text-2xl font-semibold mb-6 text-[var(--secondary)] dark:text-[var(--primary)]">Programming</h3>
+                    <ul class="space-y-4 text-gray-700 dark:text-gray-300">
+                        <li><span class="font-medium">Languages:</span> Python, PHP, C <div class="skill-progress"><div class="skill-progress-bar w-[85%]"></div></div></li>
+                        <li><span class="font-medium">Web:</span> HTML, CSS, JavaScript, MySQL <div class="skill-progress"><div class="skill-progress-bar w-[90%]"></div></div></li>
+                        <li><span class="font-medium">Framework:</span> Oracle Apex <div class="skill-progress"><div class="skill-progress-bar w-[80%]"></div></div></li19
+                        <li><span class="font-medium">Management:</span> Agile, Reporting <div class="skill-progress"><div class="skill-progress-bar w-[85%]"></div></div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Experience Section -->
+    <section id="experience" class="py-20 bg-white dark:bg-[var(--bg-dark)]">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-white">Professional Journey</h2>
+            <div class="relative">
+                <div class="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-[var(--primary)]"></div>
+                <div class="space-y-12">
+                    <div class="card bg-gray-100 dark:bg-gray-800 p-8 rounded-xl animate-slide-in relative">
+                        <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -mt-10 w-6 h-6 bg-[var(--primary)] rounded-full"></div>
+                        <h3 class="text-2xl font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">Junior IT Consultant</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Bangladesh Coast Guard | Feb 2018 - May 2022</p>
+                        <ul class="list-disc pl-5 text-gray-700 dark:text-gray-300 mt-4">
+                            <li>Led IT project coordination and management.</li>
+                            <li>Administered systems and networks, including data centers.</li>
+                            <li>Implemented robust network security protocols.</li>
+                        </ul>
+                    </div>
+                    <div class="card bg-gray-100 dark:bg-gray-800 p-8 rounded-xl animate-slide-in relative">
+                        <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -mt-10 w-6 h-6 bg-[var(--primary)] rounded-full"></div>
+                        <h3 class="text-2xl font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">System Engineer (DataCom)</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Bangla Tel Group | Nov 2015 - Feb 2018</p>
+                        <ul class="list-disc pl-5 text-gray-700 dark:text-gray-300 mt-4">
+                            <li>Installed and troubleshot network and system devices.</li>
+                            <li>Monitored transmission paths and connectivity.</li>
+                            <li>Generated detailed fault analysis reports.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="py-20 bg-gray-100 dark:bg-gray-900">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-white">Key Projects</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                    <h3 class="text-2xl font-semibold mb-4 text-[var(--secondary)] dark:text-[var(--primary)]">BCG Data Center</h3>
+                    <p class="text-gray-700 dark:text-gray-300">Architected a secure, scalable data center for the Bangladesh Coast Guard, enhancing operational efficiency and security.</p>
+                </div>
+                <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                    <h3 class="text-2xl font-semibold mb-4 text-[var(--secondary)] dark:text-[var(--primary)]">IP Phone System</h3>
+                    <p class="text-gray-700 dark:text-gray-300">Deployed a state-of-the-art IP phone system, enabling seamless and secure communication across networks.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-white dark:bg-[var(--bg-dark)]">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-white">Let's Connect</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="card bg-gray-100 dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                    <h3 class="text-2xl font-semibold mb-4 text-[var(--secondary)] dark:text-[var(--primary)]">Contact Details</h3>
+                    <p class="text-gray-700 dark:text-gray-300 mb-2"><i class="fas fa-envelope mr-2"></i> <a href="mailto:rashadul.oni@gmail.com" class="text-[var(--primary)] hover:underline">rashadul.oni@gmail.com</a></p>
+                    <p class="text-gray-700 dark:text-gray-300"><i class="fas fa-phone mr-2"></i> +88 01775555501</p>
+                </div>
+                <div class="card bg-gray-100 dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                    <h3 class="text-2xl font-semibold mb-4 text-[var(--secondary)] dark:text-[var(--primary)]">Location</h3>
+                    <p class="text-gray-700 dark:text-gray-300"><i class="fas fa-map-marker-alt mr-2"></i> Khulna-9100, Bangladesh</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer class="bg-[var(--secondary)] text-white text-center py-8">
+        <p class="text-sm">© 2025 S.M. Rashadul Islam. All rights reserved.</p>
+    </footer>
+
+    <!-- JavaScript for interactivity -->
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            });
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Dark mode toggle
+        const modeToggle = document.getElementById('modeToggle');
+        modeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            modeToggle.classList.toggle('fa-moon');
+            modeToggle.classList.toggle('fa-sun');
+            // Save preference to localStorage
+            if (document.body.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+            } else {
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // Load saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark');
+                modeToggle.classList.remove('fa-moon');
+                modeToggle.classList.add('fa-sun');
+            }
+        });
+
+        // Animate elements on scroll
+        const animateElements = document.querySelectorAll('.animate-slide-in');
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target); // Stop observing once animated
+                }
+            });
+        }, { threshold: 0.2 });
+
+        animateElements.forEach(element => observer.observe(element));
+
+        // Animate skill progress bars on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const progressBars = document.querySelectorAll('.skill-progress-bar');
+            progressBars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 300);
+            });
+        });
+    </script>
+</body>
+</html>
