@@ -1,9 +1,48 @@
-<!DOCTYPE html>
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S.M. Rashadul Islam - Cyber Portfolio</title>
+    <title>S M Rashadul Islam - Cyber Portfolio</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome for icons -->
@@ -87,19 +126,62 @@
         .mode-toggle:hover {
             transform: rotate(20deg);
         }
+        .hero-image {
+            max-width: 200px;
+            border-radius: 50%;
+            border: 5px solid #ffffff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+		.link-hover {
+      color: #0d6efd; /* Default color */
+	  text-decoration: underline;
+      
+      transition: color 0.3s ease;
+    }
+
+    .link-hover:hover {
+      color: #555; /* Red on hover */
+	  text-decoration: none;
+    }
+	
+	  .pdf-link {
+      color: #0d6efd; /* Pinkish color for PDF links */
+      text-decoration: underline;
+      font-weight:;
+      transition: color 0.3s ease, text-decoration 0.3s ease;
+    }
+
+    .pdf-link:hover {
+      color: #555; /* Darker on hover */
+      text-decoration: none;
+    }
+
+    .pdf-link i {
+      margin-right: 6px;
+    }
+
+		
     </style>
 </head>
 <body class="bg-gray-50">
     <!-- Navigation Bar -->
     <nav class="navbar fixed top-0 w-full z-50">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <a href="#" class="text-2xl font-bold text-white">S.M. Rashadul Islam</a>
+            
             <div class="flex items-center space-x-6">
-                <a href="#about" class="text-white hover:text-[var(--primary)] transition">About</a>
-                <a href="#skills" class="text-white hover:text-[var(--primary)] transition">Skills</a>
-                <a href="#experience" class="text-white hover:text-[var(--primary)] transition">Experience</a>
+                <a href="#education" class="text-white hover:text-[var(--primary)] transition">Academic Qualification</a>
+                <a href="#certifications" class="text-white hover:text-[var(--primary)] transition">Professional Certification</a>
+                <a href="#experience" class="text-white hover:text-[var(--primary)] transition">Employment History</a>
+                <a href="#proficiency" class="text-white hover:text-[var(--primary)] transition">Skills and Proficiency</a>
+                <a href="#specialization" class="text-white hover:text-[var(--primary)] transition">Specialization</a>
+                <a href="#training" class="text-white hover:text-[var(--primary)] transition">Training</a>
                 <a href="#projects" class="text-white hover:text-[var(--primary)] transition">Projects</a>
-                <a href="#contact" class="text-white hover:text-[var(--primary)] transition">Contact</a>
+                <a href="#research" class="text-white hover:text-[var(--primary)] transition">Research</a>
+                <a href="#awards" class="text-white hover:text-[var(--primary)] transition">Awards</a>
+                <a href="#extracurricular" class="text-white hover:text-[var(--primary)] transition">Extra-Curricular</a>
+                <a href="#qualifications" class="text-white hover:text-[var(--primary)] transition">Qualifications</a>
+                <a href="#languages" class="text-white hover:text-[var(--primary)] transition">Languages</a>
+                <a href="#contact" class="text-white hover:text-[var(--primary)] transition">Personal Details</a>
                 <i class="fas fa-moon text-white text-xl mode-toggle" id="modeToggle"></i>
             </div>
         </div>
@@ -108,134 +190,723 @@
     <!-- Hero Section -->
     <header id="hero" class="hero text-white text-center pt-32 pb-48">
         <div class="container mx-auto px-4">
-            <h1 class="text-6xl font-extrabold mb-4 animate-slide-in">S.M. Rashadul Islam</h1>
+            <h1 class="text-6xl font-extrabold mb-4 animate-slide-in">S M Rashadul Islam</h1>
             <p class="text-2xl mb-8 font-light">Cyber Security Specialist | Network Architect | System Innovator</p>
+            
             <a href="#contact" class="bg-[var(--primary)] text-black px-8 py-3 rounded-full font-semibold hover:bg-green-300 transition">Connect with Me</a>
         </div>
     </header>
 
-    <!-- About Section -->
-    <section id="about" class="py-20 bg-white dark:bg-[var(--bg-dark)]">
+    <!-- Academic Qualification Section -->
+    <section id="education" class="py-20 bg-white dark:bg-[var(--bg-dark)]">
         <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-white">Who Am I</h2>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                <div class="card bg-gray-100 dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
-                    <p class="text-gray-700 dark:text-gray-300 leading-relaxed">I am S.M. Rashadul Islam, a Cyber Security and Network Engineer with over 7 years of experience crafting secure, scalable, and innovative IT solutions. My passion drives me to tackle complex challenges and deliver cutting-edge systems for businesses worldwide.</p>
-                </div>
-                <div class="card bg-gray-100 dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
-                    <p class="text-gray-700 dark:text-gray-300 leading-relaxed">Specializing in network architecture, security protocols, and IT consulting, I have led high-impact projects with expertise in advanced tools and technologies. Currently, I’m pursuing a Master’s in Cyber Security and Forensic Information Technology at the University of Portsmouth, pushing the boundaries of digital innovation.</p>
-                </div>
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-white">Academic Qualification</h2>
+            <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                <table class="w-full text-gray-700 dark:text-gray-300">
+                    <thead>
+                        <tr class="border-b border-gray-300 dark:border-gray-600">
+                            <th class="py-3 px-4 text-left font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">Degree</th>
+                            <th class="py-3 px-4 text-left font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">Concentration/Major</th>
+                            <th class="py-3 px-4 text-left font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">Institute</th>
+                            <th class="py-3 px-4 text-left font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">Result</th>
+                            <th class="py-3 px-4 text-left font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">Passing Year</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <td class="py-3 px-4">Master of Science  </td>
+                            <td class="py-3 px-4">Cyber Security and Forensic Information Technology</td>
+                            <td class="py-3 px-4"><a href="https://www.port.ac.uk/"  class="link-hover">University of Portsmouth </a></td> 
+                            <td class="py-3 px-4"> <a href="your-file.pdf" target="_blank" class="pdf-link"> <i class="fas fa-file-pdf"></i> First Class</a></td>
+                            <td class="py-3 px-4">2025</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <td class="py-3 px-4">M.Sc. Engineering</td>
+                            <td class="py-3 px-4">Computer Network & Architecture</td>
+							<td class="py-3 px-4"><a href="https://www.aiub.edu/"  class="link-hover">American International University Bangladesh</a></td>
+                           
+                            <td class="py-3 px-4"> <a href="your-file.pdf" target="_blank" class="pdf-link"> <i class="fas fa-file-pdf"></i> First Class</a></td>
+							 
+						
+							 
+                            <td class="py-3 px-4">2020</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <td class="py-3 px-4">B.Sc. Engineering</td>
+                            <td class="py-3 px-4">Computer Science & Engineering</td>
+							 <td class="py-3 px-4"><a href="https://mbstu.ac.bd/"  class="link-hover">Mawlana Bhashani Science and Technology University </a></td>
+                            
+                            <td class="py-3 px-4"> <a href="your-file.pdf" target="_blank" class="pdf-link"> <i class="fas fa-file-pdf"></i> Second Class</a></td>
+                            <td class="py-3 px-4">2014</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <td class="py-3 px-4">H.S.C.</td>
+                            <td class="py-3 px-4">Science</td>
+							 <td class="py-3 px-4"><a href="https://www.mmcitycollege.edu.bd/"  class="link-hover">M.M. City College Khulna </a></td>
+                            
+                            <td class="py-3 px-4"> <a href="your-file.pdf" target="_blank" class="pdf-link"> <i class="fas fa-file-pdf"></i> First Class</a></td>
+                            <td class="py-3 px-4">2006</td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-4">S.S.C.</td>
+                            <td class="py-3 px-4">Science</td>
+							 <td class="py-3 px-4"><a href="https://www.kzs.edu.bd/"  class="link-hover">Khulna Zilla School </a></td>
+                          
+                            <td class="py-3 px-4"> <a href="your-file.pdf" target="_blank" class="pdf-link"> <i class="fas fa-file-pdf"></i> First Class</a></td>
+                            <td class="py-3 px-4">2004</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </section>
 
-    <!-- Skills Section -->
-    <section id="skills" class="py-20 bg-gray-100 dark:bg-gray-900">
+    <!-- Professional Certification Section -->
+    <section id="certifications" class="py-20 bg-gray-100 dark:bg-gray-900">
         <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-white">Expertise</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
-                    <h3 class="text-2xl font-semibold mb-6 text-[var(--secondary)] dark:text-[var(--primary)]">Network Architecture</h3>
-                    <ul class="space-y-4 text-gray-700 dark:text-gray-300">
-                        <li><span class="font-medium">Routers:</span> Cisco, Juniper, MikroTik <div class="skill-progress"><div class="skill-progress-bar w-[90%]"></div></div></li>
-                        <li><span class="font-medium">Switches:</span> Cisco, Juniper, Netgear <div class="skill-progress"><div class="skill-progress-bar w-[85%]"></div></div></li>
-                        <li><span class="font-medium">Firewalls:</span> Cisco, Sophos <div class="skill-progress"><div class="skill-progress-bar w-[80%]"></div></div></li>
-                        <li><span class="font-medium">Security:</span> Network Troubleshooting <div class="skill-progress"><div class="skill-progress-bar w-[95%]"></div></div></li>
-                    </ul>
-                </div>
-                <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
-                    <h3 class="text-2xl font-semibold mb-6 text-[var(--secondary)] dark:text-[var(--primary)]">System Administration</h3>
-                    <ul class="space-y-4 text-gray-700 dark:text-gray-300">
-                        <li><span class="font-medium">Servers:</span> Windows & Linux <div class="skill-progress"><div class="skill-progress-bar w-[90%]"></div></div></li>
-                        <li><span class="font-medium">Databases:</span> SQL, MySQL <div class="skill-progress"><div class="skill-progress-bar w-[85%]"></div></div></li>
-                        <li><span class="font-medium">Cloud:</span> AWS Solutions <div class="skill-progress"><div class="skill-progress-bar w-[80%]"></div></div></li>
-                        <li><span class="font-medium">Virtualization:</span> Data Center Management <div class="skill-progress"><div class="skill-progress-bar w-[90%]"></div></div></li>
-                    </ul>
-                </div>
-                <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
-                    <h3 class="text-2xl font-semibold mb-6 text-[var(--secondary)] dark:text-[var(--primary)]">Programming</h3>
-                    <ul class="space-y-4 text-gray-700 dark:text-gray-300">
-                        <li><span class="font-medium">Languages:</span> Python, PHP, C <div class="skill-progress"><div class="skill-progress-bar w-[85%]"></div></div></li>
-                        <li><span class="font-medium">Web:</span> HTML, CSS, JavaScript, MySQL <div class="skill-progress"><div class="skill-progress-bar w-[90%]"></div></div></li>
-                        <li><span class="font-medium">Framework:</span> Oracle Apex <div class="skill-progress"><div class="skill-progress-bar w-[80%]"></div></div></li19
-                        <li><span class="font-medium">Management:</span> Agile, Reporting <div class="skill-progress"><div class="skill-progress-bar w-[85%]"></div></div></li>
-                    </ul>
-                </div>
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-white">Professional Certifications</h2>
+            <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                <table class="w-full text-gray-700 dark:text-gray-300">
+                    <thead>
+                        <tr class="border-b border-gray-300 dark:border-gray-600">
+                            <th class="py-3 px-4 text-left font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">Certification</th>
+                            <th class="py-3 px-4 text-left font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">Candidate ID</th>
+                            <th class="py-3 px-4 text-left font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">Vendor ID</th>
+                            <th class="py-3 px-4 text-left font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">Registration ID</th>
+                              <!-- <th class="py-3 px-4 text-left font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">Testing Site</th>
+                              <!-- <th class="py-3 px-4 text-left font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">Validation ID</th> -->
+                            <th class="py-3 px-4 text-left font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <td class="py-3 px-4">CCNA 200-120 (Routing & Switching)</td>
+                            <td class="py-3 px-4">249651010</td>
+                            <td class="py-3 px-4">CSCO13104245</td>
+                            <td class="py-3 px-4">318731506</td>
+                            <!-- <td class="py-3 px-4">75791</td>
+                            <td class="py-3 px-4">1756117729</td> -->
+                            <td class="py-3 px-4">933</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <td class="py-3 px-4">MCSA 740 (Installation, Storage, and Compute with Windows Server 2016)</td>
+                            <td class="py-3 px-4">MS0618413636</td>
+                            <td class="py-3 px-4">MS0618413636</td>
+                            <td class="py-3 px-4">343869384</td>
+                            <!-- <td class="py-3 px-4">71806</td>
+                            <td class="py-3 px-4">-</td> -->
+                            <td class="py-3 px-4">780</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <td class="py-3 px-4">MCSA 741 (Networking with Windows Server 2016)</td>
+                            <td class="py-3 px-4">MS0618413636</td>
+                            <td class="py-3 px-4">MS0618413636</td>
+                            <td class="py-3 px-4">343871780</td>
+                            <!--<td class="py-3 px-4">71806</td>
+                            <td class="py-3 px-4">-</td> -->
+                            <td class="py-3 px-4">845</td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-4">AWS Certified Solutions Architect - Associate</td>
+                            <td class="py-3 px-4">AWS01739278</td>
+                            <td class="py-3 px-4">AWS01739278</td>
+                            <td class="py-3 px-4">383128810</td>
+                            <!--<td class="py-3 px-4">-</td>
+                            <td class="py-3 px-4">-</td> -->
+                            <td class="py-3 px-4">729</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </section>
 
-    <!-- Experience Section -->
+    <!-- Employment History Section -->
     <section id="experience" class="py-20 bg-white dark:bg-[var(--bg-dark)]">
         <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-white">Professional Journey</h2>
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-white">Employment History</h2>
+            <p class="text-center text-gray-600 dark:text-gray-400 mb-8">Total Experience: 7 Years 8 Months</p>
             <div class="relative">
                 <div class="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-[var(--primary)]"></div>
                 <div class="space-y-12">
                     <div class="card bg-gray-100 dark:bg-gray-800 p-8 rounded-xl animate-slide-in relative">
                         <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -mt-10 w-6 h-6 bg-[var(--primary)] rounded-full"></div>
-                        <h3 class="text-2xl font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">Junior IT Consultant</h3>
-                        <p class="text-gray-600 dark:text-gray-400">Bangladesh Coast Guard | Feb 2018 - May 2022</p>
-                        <ul class="list-disc pl-5 text-gray-700 dark:text-gray-300 mt-4">
-                            <li>Led IT project coordination and management.</li>
-                            <li>Administered systems and networks, including data centers.</li>
-                            <li>Implemented robust network security protocols.</li>
+                        <h3 class="text-2xl font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">Junior IT Consultant</h3><br>
+						<h3 class="text-1xl font-semibold text-[var(--secondary)] dark:text-[var(--primary)]"><a href="https://coastguard.gov.bd/"  class="link-hover" <b>Bangladesh Coast Guard</b></a> </h3> <br>  Feb 2018 - May 2022 (4 Years 4 Months) <a href="your-file.pdf" target="_blank" class="pdf-link"> <i class="fas fa-file-pdf"></i>Experience Certificate</a></p>
+                       
+                        <h4 class="text-lg font-medium text-gray-700 dark:text-gray-300 mt-4"><b>Duties/Responsibilities:</b></h4>
+                        <ul class="list-disc pl-5 text-gray-700 dark:text-gray-300 mt-2">
+                            <li>BCG all IT Project Coordination</li>
+                            <li>System Administrator</li>
+                            <li>Network Administrator</li>
+                            <li>Network Security Planning and Appliance</li>
+                            <li>BCG Data Center in charge</li>
+                            <li>Network Planning and troubleshooting</li>
+                            <li>BCG ERP System</li>
                         </ul>
                     </div>
                     <div class="card bg-gray-100 dark:bg-gray-800 p-8 rounded-xl animate-slide-in relative">
                         <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -mt-10 w-6 h-6 bg-[var(--primary)] rounded-full"></div>
-                        <h3 class="text-2xl font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">System Engineer (DataCom)</h3>
-                        <p class="text-gray-600 dark:text-gray-400">Bangla Tel Group | Nov 2015 - Feb 2018</p>
-                        <ul class="list-disc pl-5 text-gray-700 dark:text-gray-300 mt-4">
-                            <li>Installed and troubleshot network and system devices.</li>
-                            <li>Monitored transmission paths and connectivity.</li>
-                            <li>Generated detailed fault analysis reports.</li>
+                        <h3 class="text-2xl font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">System Engineer (DataCom)</h3><br>
+                        <h3 class="text-1xl font-semibold text-[var(--secondary)] dark:text-[var(--primary)]"><a href="https://banglatel.com.bd/"  class="link-hover"  <b>Bangla Tel Group</b></a> </h2> <br> Nov 2015 - Feb 2018 (2 Years 3 Months) <a href="your-file.pdf" target="_blank" class="pdf-link"> <i class="fas fa-file-pdf"></i>Experience Certificate</a></p>
+                        <h4 class="text-lg font-medium text-gray-700 dark:text-gray-300 mt-4"><b>Duties/Responsibilities:</b></h4>
+                        <ul class="list-disc pl-5 text-gray-700 dark:text-gray-300 mt-2">
+                            <li>Installing, configuring, and troubleshooting Switches, Routers, Servers, and other network/system devices</li>
+                            <li>Troubleshoot all local and international transmission paths and connectivity status</li>
+                            <li>Analyze alarms and latency and web-related problems and solve them</li>
+                            <li>Generating reports for Alarm/Alarm analysis/Fault analysis of the equipment, rectification report, testing report, etc.</li>
+                        </ul>
+                    </div>
+                    <div class="card bg-gray-100 dark:bg-gray-800 p-8 rounded-xl animate-slide-in relative">
+                        <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -mt-10 w-6 h-6 bg-[var(--primary)] rounded-full"></div>
+                        <h3 class="text-2xl font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">Junior Software Developer</h3> <br>
+						<h3 class="text-1xl font-semibold text-[var(--secondary)] dark:text-[var(--primary)]"><a href="https://www.dhakawebhost.com/"  class="link-hover" <b>Dhaka Web Host LTD.</b></a> </h2> <br> Oct 2014 - Oct 2015 (1 Year 1 Month)</p>
+                        
+                        <h4 class="text-lg font-medium text-gray-700 dark:text-gray-300 mt-4">Duties/Responsibilities:</h4>
+                        <ul class="list-disc pl-5 text-gray-700 dark:text-gray-300 mt-2">
+                            <li>Manage web servers, provide data storage for customers, and manage them</li>
+                            <li>Work on a Web-based Software developer team as a back-end developer</li>
                         </ul>
                     </div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills and Proficiency Section -->
+    <section id="proficiency" class="py-20 bg-gray-100 dark:bg-gray-900">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-white">Skills and Proficiency</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="card bg-gray-100 dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                    <h3 class="text-2xl font-semibold mb-6 text-[var(--secondary)] dark:text-[var(--primary)]">Network and Security</h3>
+                    <ul class="space-y-4 text-gray-700 dark:text-gray-300">
+                        <li><span class="font-medium">Network Architecture and Designing</span> <div class="skill-progress"><div class="skill-progress-bar w-[90%]"></div></div></li>
+                        <li><span class="font-medium">Network Security / Cyber Security</span> <div class="skill-progress"><div class="skill-progress-bar w-[95%]"></div></div></li>
+                        <li><span class="font-medium">National and International Submarine Cable / ITC Infrastructure</span> <div class="skill-progress"><div class="skill-progress-bar w-[85%]"></div></div></li>
+                    </ul>
+                </div>
+                <div class="card bg-gray-100 dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                    <h3 class="text-2xl font-semibold mb-6 text-[var(--secondary)] dark:text-[var(--primary)]">Systems and Infrastructure</h3>
+                    <ul class="space-y-4 text-gray-700 dark:text-gray-300">
+                        <li><span class="font-medium">Data Center Designing & Implementation</span> <div class="skill-progress"><div class="skill-progress-bar w-[90%]"></div></div></li>
+                        <li><span class="font-medium">Virtualization</span> <div class="skill-progress"><div class="skill-progress-bar w-[85%]"></div></div></li>
+                        <li><span class="font-medium">Storage System</span> <div class="skill-progress"><div class="skill-progress-bar w-[80%]"></div></div></li>
+                        <li><span class="font-medium">Servers and Network Devices Configuration and Troubleshooting</span> <div class="skill-progress"><div class="skill-progress-bar w-[90%]"></div></div></li>
+                    </ul>
+                </div>
+                <div class="card bg-gray-100 dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                    <h3 class="text-2xl font-semibold mb-6 text-[var(--secondary)] dark:text-[var(--primary)]">Specialized Skills</h3>
+                    <ul class="space-y-4 text-gray-700 dark:text-gray-300">
+                        <li><span class="font-medium">Hardware Troubleshooting</span> <div class="skill-progress"><div class="skill-progress-bar w-[85%]"></div></div></li>
+                        <li><span class="font-medium">Linux (RHCE/RHCSA)</span> <div class="skill-progress"><div class="skill-progress-bar w-[90%]"></div></div></li>
+                        <li><span class="font-medium">Project Management (EOI, RFP, UAT, Auditing, Reporting, Survey)</span> <div class="skill-progress"><div class="skill-progress-bar w-[85%]"></div></div></li>
+                        <li><span class="font-medium">VOIP System / Video Conferencing System</span> <div class="skill-progress"><div class="skill-progress-bar w-[80%]"></div></div></li>
+                        <li><span class="font-medium">IoT</span> <div class="skill-progress"><div class="skill-progress-bar w-[75%]"></div></div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Specialization Section -->
+    <section id="specialization" class="py-20 bg-white dark:bg-[var(--bg-dark)]">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-white">Specialization</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                    <h3 class="text-2xl font-semibold mb-6 text-[var(--secondary)] dark:text-[var(--primary)]">Network Devices</h3>
+                    <ul class="space-y-4 text-gray-700 dark:text-gray-300">
+                        <li><span class="font-medium">Router:</span> Cisco, Juniper, MikroTik</li>
+                        <li><span class="font-medium">Switch:</span> Cisco, Juniper, Netgear</li>
+                        <li><span class="font-medium">Firewall:</span> Cisco, Sophos</li>
+                        <li><span class="font-medium">DPI:</span> Juniper Deep Packet Inspection</li>
+                        <li><span class="font-medium">Server:</span> Windows/Linux (RedHat) (DHCP, WDS, DNS, AD, AAA, Web, Storage, FTP, RADIUS, Exchange, Proxy, VPN, SQL, Apache)</li>
+                        <li><span class="font-medium">MUX:</span> ZTE, Ciena</li>
+                        <li><span class="font-medium">Other:</span> Amplifier, ODF, Media Converter, SFP, Access Points Solutions</li>
+                    </ul>
+                </div>
+                <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                    <h3 class="text-2xl font-semibold mb-6 text-[var(--secondary)] dark:text-[var(--primary)]">Languages</h3>
+                    <ul class="space-y-4 text-gray-700 dark:text-gray-300">
+                        <li><span class="font-medium">Programming Languages:</span> Python, PHP, C</li>
+                        <li><span class="font-medium">Web Programming:</span> Oracle; Framework: Apex</li>
+                        <li><span class="font-medium">Markup Languages:</span> HTML/DHTML, CSS, JavaScript</li>
+                        <li><span class="font-medium">Databases:</span> SQL, MySQL</li>
+                    </ul>
+                </div>
+                <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                    <h3 class="text-2xl font-semibold mb-6 text-[var(--secondary)] dark:text-[var(--primary)]">Applications</h3>
+                    <ul class="space-y-4 text-gray-700 dark:text-gray-300">
+                        <li><span class="font-medium">Tools:</span> Visio, WireShark, SolarWinds, GNS, Packet Tracer, VMware</li>
+                        <li><span class="font-medium">Network Management:</span> NMS and SNMP Applications</li>
+                    </ul>
+                </div>
+                <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                    <h3 class="text-2xl font-semibold mb-6 text-[var(--secondary)] dark:text-[var(--primary)]">Power Systems</h3>
+                    <ul class="space-y-4 text-gray-700 dark:text-gray-300">
+                        <li><span class="font-medium">Data Center:</span> Device Power Management System</li>
+                        <li><span class="font-medium">UPS:</span> Online/Offline UPS</li>
+                        <li><span class="font-medium">Rectifier:</span> Power Rectification Systems</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Training Summary Section -->
+    <section id="training" class="py-20 bg-gray-100 dark:bg-gray-900">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-white">Training Summary</h2>
+            <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                <table class="w-full text-gray-700 dark:text-gray-300">
+                    <thead>
+                        <tr class="border-b border-gray-300 dark:border-gray-600">
+                            <th class="py-3 px-4 text-left font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">Training Title</th>
+                            <th class="py-3 px-4 text-left font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">Topic</th>
+                            <th class="py-3 px-4 text-left font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">Institute</th>
+                            <th class="py-3 px-4 text-left font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">Country</th>
+                            <th class="py-3 px-4 text-left font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">Location</th>
+                            <th class="py-3 px-4 text-left font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">Year</th>
+                            <th class="py-3 px-4 text-left font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <td class="py-3 px-4">Web Application Development - PHP</td>
+                            <td class="py-3 px-4">Creating dynamic website using PHP-MySQL platform, Creating web application software</td>
+                            <td class="py-3 px-4">BASIS Institute of Technology & Management (BITM)</td>
+                            <td class="py-3 px-4">Bangladesh</td>
+                            <td class="py-3 px-4">Basis, BDBL Bhaban, 12 Karwan Bazar, Dhaka</td>
+                            <td class="py-3 px-4">2015</td>
+                            <td class="py-3 px-4">3 months</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <td class="py-3 px-4">Java Script</td>
+                            <td class="py-3 px-4">Basic JS</td>
+                            <td class="py-3 px-4">BASIS Institute of Technology & Management (BITM)</td>
+                            <td class="py-3 px-4">Bangladesh</td>
+                            <td class="py-3 px-4">Basis, BDBL Bhaban, 12 Karwan Bazar, Dhaka</td>
+                            <td class="py-3 px-4">2015</td>
+                            <td class="py-3 px-4">2 months</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <td class="py-3 px-4">Social Media Marketing</td>
+                            <td class="py-3 px-4">SMM</td>
+                            <td class="py-3 px-4">BASIS Institute of Technology & Management (BITM)</td>
+                            <td class="py-3 px-4">Bangladesh</td>
+                            <td class="py-3 px-4">Basis, BDBL Bhaban, 12 Karwan Bazar, Dhaka</td>
+                            <td class="py-3 px-4">2015</td>
+                            <td class="py-3 px-4">44 hours</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <td class="py-3 px-4">eBGP & iBGP Routing-IP Core</td>
+                            <td class="py-3 px-4">Basic BGP (iBGP & eBGP)</td>
+                            <td class="py-3 px-4">CSL (Dhanmondi Branch)</td>
+                            <td class="py-3 px-4">Bangladesh</td>
+                            <td class="py-3 px-4">House#18, Road#27 (old), Dhanmondi, Dhaka-1209</td>
+                            <td class="py-3 px-4">2018</td>
+                            <td class="py-3 px-4">3 days</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <td class="py-3 px-4">CCNA</td>
+                            <td class="py-3 px-4">CCNA Routing and Switching</td>
+                            <td class="py-3 px-4">CSL Training (Dhanmondi Branch)</td>
+                            <td class="py-3 px-4">Bangladesh</td>
+                            <td class="py-3 px-4">House#18, Road#27 (old), Dhanmondi, Dhaka-1209</td>
+                            <td class="py-3 px-4">2017</td>
+                            <td class="py-3 px-4">3 months</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <td class="py-3 px-4">Linux</td>
+                            <td class="py-3 px-4">RHCE/RHCSA</td>
+                            <td class="py-3 px-4">Linux Pathshala</td>
+                            <td class="py-3 px-4">Bangladesh</td>
+                            <td class="py-3 px-4">95 Rd No 13D, Banani, Dhaka 1212</td>
+                            <td class="py-3 px-4">2018</td>
+                            <td class="py-3 px-4">3 months</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <td class="py-3 px-4">Cyber Security</td>
+                            <td class="py-3 px-4">Awareness</td>
+                            <td class="py-3 px-4">BASIS Institute of Technology & Management (BITM)</td>
+                            <td class="py-3 px-4">Bangladesh</td>
+                            <td class="py-3 px-4">Basis, BDBL Bhaban, 12 Karwan Bazar, Dhaka</td>
+                            <td class="py-3 px-4">2019</td>
+                            <td class="py-3 px-4">3 months</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <td class="py-3 px-4">CCNP</td>
+                            <td class="py-3 px-4">CCNP R&S</td>
+                            <td class="py-3 px-4">Md. Nashare (MetroNet)</td>
+                            <td class="py-3 px-4">Bangladesh</td>
+                            <td class="py-3 px-4">Dhanmondi, Dhaka</td>
+                            <td class="py-3 px-4">2017</td>
+                            <td class="py-3 px-4">4 months</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <td class="py-3 px-4">MikroTik</td>
+                            <td class="py-3 px-4">ISP Setup And Administration</td>
+                            <td class="py-3 px-4">CSL (Dhanmondi Branch)</td>
+                            <td class="py-3 px-4">Bangladesh</td>
+                            <td class="py-3 px-4">Banani, Dhaka</td>
+                            <td class="py-3 px-4">2017</td>
+                            <td class="py-3 px-4">3 months</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <td class="py-3 px-4">IoT</td>
+                            <td class="py-3 px-4">IoT Technology</td>
+                            <td class="py-3 px-4">AIUB</td>
+                            <td class="py-3 px-4">Bangladesh</td>
+                            <td class="py-3 px-4">Banani, Dhaka</td>
+                            <td class="py-3 px-4">2018</td>
+                            <td class="py-3 px-4">2 months</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <td class="py-3 px-4">Windows Server 2016</td>
+                            <td class="py-3 px-4">Windows Server 2016</td>
+                            <td class="py-3 px-4">AT Computer</td>
+                            <td class="py-3 px-4">Bangladesh</td>
+                            <td class="py-3 px-4">Mirpur, Dhaka</td>
+                            <td class="py-3 px-4">2018</td>
+                            <td class="py-3 px-4">4 months</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <td class="py-3 px-4">CCNA Security</td>
+                            <td class="py-3 px-4">CCNA Security</td>
+                            <td class="py-3 px-4">AIUB</td>
+                            <td class="py-3 px-4">Bangladesh</td>
+                            <td class="py-3 px-4">Banani, Dhaka</td>
+                            <td class="py-3 px-4">2019</td>
+                            <td class="py-3 px-4">7 days</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <td class="py-3 px-4">Office 365</td>
+                            <td class="py-3 px-4">Office 365 Administration</td>
+                            <td class="py-3 px-4">AT Computer</td>
+                            <td class="py-3 px-4">Bangladesh</td>
+                            <td class="py-3 px-4">Mirpur, Dhaka</td>
+                            <td class="py-3 px-4">2018</td>
+                            <td class="py-3 px-4">3 months</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <td class="py-3 px-4">CGRPMS</td>
+                            <td class="py-3 px-4">Coastguard Resource and Planning Management System</td>
+                            <td class="py-3 px-4">Solution Art Ltd</td>
+                            <td class="py-3 px-4">Bangladesh</td>
+                            <td class="py-3 px-4">Coast Guard Headquarters</td>
+                            <td class="py-3 px-4">2018</td>
+                            <td class="py-3 px-4">5 days</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <td class="py-3 px-4">National Web Portal</td>
+                            <td class="py-3 px-4">National Web Portal Management</td>
+                            <td class="py-3 px-4">ICT Division, Bangladesh</td>
+                            <td class="py-3 px-4">Bangladesh</td>
+                            <td class="py-3 px-4">Agargaon, Dhaka</td>
+                            <td class="py-3 px-4">2019</td>
+                            <td class="py-3 px-4">2 days</td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-4">Digital Service Design Lab</td>
+                            <td class="py-3 px-4">Border and Coastal Area Operational Management System</td>
+                            <td class="py-3 px-4">Ministry of Home Affairs, A2I and ICTD</td>
+                            <td class="py-3 px-4">Bangladesh</td>
+                            <td class="py-3 px-4">BICM, Topkhana, Dhaka</td>
+                            <td class="py-3 px-4">2019</td>
+                            <td class="py-3 px-4">6 days</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </section>
 
     <!-- Projects Section -->
-    <section id="projects" class="py-20 bg-gray-100 dark:bg-gray-900">
+    <section id="projects" class="py-20 bg-white dark:bg-[var(--bg-dark)]">
         <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-white">Key Projects</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
-                    <h3 class="text-2xl font-semibold mb-4 text-[var(--secondary)] dark:text-[var(--primary)]">BCG Data Center</h3>
-                    <p class="text-gray-700 dark:text-gray-300">Architected a secure, scalable data center for the Bangladesh Coast Guard, enhancing operational efficiency and security.</p>
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-white">Projects</h2>
+            <div class="mb-12">
+                <h3 class="text-3xl font-semibold mb-8 text-[var(--secondary)] dark:text-[var(--primary)] text-center">Professional Projects</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                        <h4 class="text-2xl font-semibold mb-4 text-[var(--secondary)] dark:text-[var(--primary)]">BTCL & BD Link ITC Project (Benapole to Dhaka)</h4>
+                        <p class="text-gray-700 dark:text-gray-300">Designed and implemented a high-capacity ITC infrastructure connecting Benapole to Dhaka, enhancing regional connectivity and data transfer efficiency.</p>
+                    </div>
+                    <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                        <h4 class="text-2xl font-semibold mb-4 text-[var(--secondary)] dark:text-[var(--primary)]">BCG Data Center Project</h4>
+                        <p class="text-gray-700 dark:text-gray-300">Architected a secure, scalable data center for the Bangladesh Coast Guard, improving operational efficiency and data security.</p>
+                    </div>
+                    <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                        <h4 class="text-2xl font-semibold mb-4 text-[var(--secondary)] dark:text-[var(--primary)]">BCG Networking HQ and Zones</h4>
+                        <p class="text-gray-700 dark:text-gray-300">Developed a robust network infrastructure for Bangladesh Coast Guard's headquarters and regional zones, ensuring seamless communication and security.</p>
+                    </div>
+                    <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                        <h4 class="text-2xl font-semibold mb-4 text-[var(--secondary)] dark:text-[var(--primary)]">IP Phone Project</h4>
+                        <p class="text-gray-700 dark:text-gray-300">Deployed a state-of-the-art IP phone system, enabling secure and efficient communication across organizational networks.</p>
+                    </div>
+                    <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                        <h4 class="text-2xl font-semibold mb-4 text-[var(--secondary)] dark:text-[var(--primary)]">Video Conferencing Project</h4>
+                        <p class="text-gray-700 dark:text-gray-300">Implemented a video conferencing system for enhanced remote collaboration and operational coordination.</p>
+                    </div>
+                    <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                        <h4 class="text-2xl font-semibold mb-4 text-[var(--secondary)] dark:text-[var(--primary)]">Satellite Communication Project with BCG and BSCL</h4>
+                        <p class="text-gray-700 dark:text-gray-300">Led the deployment of a satellite communication system for Bangladesh Coast Guard and BSCL, ensuring reliable connectivity in remote areas.</p>
+                    </div>
                 </div>
-                <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
-                    <h3 class="text-2xl font-semibold mb-4 text-[var(--secondary)] dark:text-[var(--primary)]">IP Phone System</h3>
-                    <p class="text-gray-700 dark:text-gray-300">Deployed a state-of-the-art IP phone system, enabling seamless and secure communication across networks.</p>
+            </div>
+            <div>
+                <h3 class="text-3xl font-semibold mb-8 text-[var(--secondary)] dark:text-[var(--primary)] text-center">Academic Projects</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                        <h4 class="text-2xl font-semibold mb-4 text-[var(--secondary)] dark:text-[var(--primary)]">Phone Book Project in C (BSc)</h4>
+                        <p class="text-gray-700 dark:text-gray-300">Developed a phone book application using C, implementing basic CRUD operations for contact management.</p>
+                    </div>
+                    <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                        <h4 class="text-2xl font-semibold mb-4 text-[var(--secondary)] dark:text-[var(--primary)]">ATM Management System Using C# (BSc)</h4>
+                        <p class="text-gray-700 dark:text-gray-300">Created an ATM management system using C#, featuring secure transaction processing and user authentication.</p>
+                    </div>
+                    <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                        <h4 class="text-2xl font-semibold mb-4 text-[var(--secondary)] dark:text-[var(--primary)]">Database Design: Railway System (MySQL) (BSc)</h4>
+                        <p class="text-gray-700 dark:text-gray-300">Designed a comprehensive MySQL database for a railway system, optimizing data storage and retrieval for operational efficiency.</p>
+                    </div>
+                    <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                        <h4 class="text-2xl font-semibold mb-4 text-[var(--secondary)] dark:text-[var(--primary)]">PatroPatry.com Using HTML, CSS, MySQL, PHP (BSc)</h4>
+                        <p class="text-gray-700 dark:text-gray-300">Built a matrimonial website using HTML, CSS, MySQL, and PHP, with features for user profiles and matchmaking.</p>
+                    </div>
+                    <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                        <h4 class="text-2xl font-semibold mb-4 text-[var(--secondary)] dark:text-[var(--primary)]">E-commerce Website Using HTML, CSS, JS, MySQL, PHP (BSc)</h4>
+                        <p class="text-gray-700 dark:text-gray-300">Developed an e-commerce platform with HTML, CSS, JavaScript, MySQL, and PHP, supporting product listings, cart, and checkout functionalities.</p>
+                    </div>
+                    <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                        <h4 class="text-2xl font-semibold mb-4 text-[var(--secondary)] dark:text-[var(--primary)]">Establish a Full Enterprise Network in Lab Environment (MSc)</h4>
+                        <p class="text-gray-700 dark:text-gray-300">Set up a simulated enterprise network in a lab, incorporating routing, switching, and security configurations.</p>
+                    </div>
+                   
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Contact Section -->
+    <!-- Research and Thesis Section -->
+    <section id="research" class="py-20 bg-gray-100 dark:bg-gray-900">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-white">Research & Dissertation</h2>
+            <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                <h3 class="text-2xl font-semibold mb-6 text-[var(--secondary)] dark:text-[var(--primary)]"> Thesis</h3>
+                <p class="text-gray-700 dark:text-gray-300 mb-4"><span class="font-medium"><b></span> Quantum Networking</p>
+                <p class="text-gray-700 dark:text-gray-300 mb-4"><span class="font-medium">Paper:</span> A New Horizon of Data Communication through Quantum Entanglement</p></b>
+                <h4 class="text-lg font-medium text-gray-700 dark:text-gray-300 mt-4">Conferences:</h4>
+                <ul class="list-disc pl-5 text-gray-700 dark:text-gray-300 mt-2 mb-4">
+                    <li>British Columbia Institute of Technology, Burnaby, BC, Canada (<a href="https://gctim.org/publications/#" class="link-hover">Link</a>)</li>
+                    <li>American International University-Bangladesh, Dhaka, Bangladesh</li>
+                </ul>
+                <h4 class="text-lg font-medium text-gray-700 dark:text-gray-300 mt-4">Publications:</h4>
+                <ul class="list-disc pl-5 text-gray-700 dark:text-gray-300 mt-2 mb-4">
+                    <li><a href="https://arxiv.org/abs/2408.00029" class="link-hover">arXiv:2408.00029</a></li>
+                    <li><a href="http://dspace.aiub.edu:8080/jspui/handle/123456789/34" class="link-hover">AIUB DSpace</a></li>
+                </ul>
+                <h4 class="text-lg font-medium text-gray-700 dark:text-gray-300 mt-4">Co-workers:</h4>
+                <ul class="list-disc pl-5 text-gray-700 dark:text-gray-300 mt-2">
+                    <li>Md. Manirul Islam, Assistant Professor, Faculty of Science and IT, American International University-Bangladesh</li>
+                    <li>Umme Salsabil, Faculty Member, British Columbia Institute of Technology, Burnaby, British Columbia</li>
+                </ul>
+            </div>
+			<div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                <h3 class="text-2xl font-semibold mb-6 text-[var(--secondary)] dark:text-[var(--primary)]"> Dissertation </h3>
+                <p class="text-gray-700 dark:text-gray-300 mb-4"><span class="font-medium"><b></span> Artificial Intelligence in Cybersecurity</p>
+                <p class="text-gray-700 dark:text-gray-300 mb-4"><span class="font-medium">Paper:</span> An artificial intelligence-powered system for spotting unusual user behavior in order to identify likely unlawful activity</p></b>
+                <h4 class="text-lg font-medium text-gray-700 dark:text-gray-300 mt-4">Conferences:</h4>
+               
+            
+                <h4 class="text-lg font-medium text-gray-700 dark:text-gray-300 mt-4">Supervisor: Lecturer (Assistant Professor) in Computer Science at the University of Portsmouth, UK</h4>
+                <ul class="list-disc pl-5 text-gray-700 dark:text-gray-300 mt-2">
+                    
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Awards Section -->
+    <section id="awards" class="py-20 bg-white dark:bg-[var(--bg-dark)]">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-white">Awards and Recognitions</h2>
+            <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                <ul class="space-y-4 text-gray-700 dark:text-gray-300">
+                    <li><span class="font-medium">1. Guinness World Record:</span> “Yamaha Presents SHADINOA SHOPOT on 48th Independence Day 2018”</li>
+                    <li><span class="font-medium">2. Associate Member:</span> Bangladesh Computer Society (Reg No-12071)</li>
+                    <li><span class="font-medium">3. Honored Lifetime Member:</span> The Institution of Engineers, Bangladesh (Reg No-40803)</li>
+                    <li><span class="font-medium">4. Honored Lifetime Member:</span> Quantum Foundation as a Blood Donor</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Extra-Curricular Activities Section -->
+    <section id="extracurricular" class="py-20 bg-gray-100 dark:bg-gray-900">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-white">Extra-Curricular Activities</h2>
+            <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                <ul class="space-y-4 text-gray-700 dark:text-gray-300">
+                    <li> > Participated in Inter-university Programming Contest 2011 at East West University (EWU), National Computer Programming Contest (NCPC) 2010 at Sylhet University of Science and Technology (SUST), Inter-university Programming Contest 2011 at Dhaka University of Engineering and Technology (DUET), and University Programming Contest 2012 at Mawlana Bhashani Science and Technology University (MBSTU).</li>
+                    <li> > Engaged in photography as a hobby, capturing moments and exploring creative expression.</li>
+                    <li> > Served as an organizer and volunteer for various university and community events.</li>
+                    <li> > Executive Member of the Computer Club, Computer Science & Engineering Department, Mawlana Bhashani Science and Technology University.</li>
+                    <li> > Former member of the Central Dramatic Club, Debating Society, and Red Crescent Society at Mawlana Bhashani Science and Technology University.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Special Qualifications Section -->
+    <section id="qualifications" class="py-20 bg-white dark:bg-[var(--bg-dark)]">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-white">Special Qualifications</h2>
+            <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                <ul class="space-y-4 text-gray-700 dark:text-gray-300">
+                    <li> > Highly proficient, technical, and effective team player with strong communication and problem-solving skills, experienced in development, networks, system, and project management.</li>
+                    <li> > Possess strong analytical, design, and development capabilities with excellent problem-solving abilities.</li>
+                    <li> > Demonstrate excellent communication and interpersonal skills.</li>
+                    <li> > Exhibit exceptional leadership qualities, effective teamwork, self-motivation, adaptability, and flexibility in diverse working environments.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Languages & Degree of Proficiency Section -->
+    <section id="languages" class="py-20 bg-gray-100 dark:bg-gray-900">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-white">Languages & Degree of Proficiency</h2>
+            <div class="card bg-white dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                <table class="w-full text-gray-700 dark:text-gray-300">
+                    <thead>
+                        <tr class="border-b border-gray-300 dark:border-gray-600">
+                            <th class="py-3 px-4 text-left font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">Language</th>
+							<th class="py-3 px-4 text-left font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">Listening</th>
+                            <th class="py-3 px-4 text-left font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">Speaking</th>
+                            <th class="py-3 px-4 text-left font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">Reading</th>
+                            <th class="py-3 px-4 text-left font-semibold text-[var(--secondary)] dark:text-[var(--primary)]">Writing</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <td class="py-3 px-4">Bangla</td>
+							<td class="py-3 px-4">C2</td>
+                            <td class="py-3 px-4">C2</td>
+                            <td class="py-3 px-4">C2</td>
+                            <td class="py-3 px-4">C2</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <td class="py-3 px-4">English</td>
+							<td class="py-3 px-4">C1</td>
+                            <td class="py-3 px-4">C1</td>
+                            <td class="py-3 px-4">C1</td>
+                            <td class="py-3 px-4">C1</td>
+                        </tr>
+						<tr class="border-b border-gray-200 dark:border-gray-700">
+                            <td class="py-3 px-4">Hindu</td>
+							<td class="py-3 px-4">C1</td>
+                            <td class="py-3 px-4">B1</td>
+                            <td class="py-3 px-4">A1</td>
+                            <td class="py-3 px-4">A1</td>
+                        </tr>
+						<tr class="border-b border-gray-200 dark:border-gray-700">
+                            <td class="py-3 px-4">Urdu</td>
+							<td class="py-3 px-4">C1</td>
+                            <td class="py-3 px-4">B1</td>
+                            <td class="py-3 px-4">A1</td>
+                            <td class="py-3 px-4">A1</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Personal Details Section -->
     <section id="contact" class="py-20 bg-white dark:bg-[var(--bg-dark)]">
         <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-white">Let's Connect</h2>
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-white">Personal Details</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                
                 <div class="card bg-gray-100 dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
+                    <h3 class="text-2xl font-semibold mb-4 text-[var(--secondary)] dark:text-[var(--primary)]">Personal Information</h3>
+                    <p class="text-gray-700 dark:text-gray-300 mb-2"><span class="font-medium"><b>Father's Name:</b></span> Late S.M. Nurul Islam (Engineer)</p>
+                    <p class="text-gray-700 dark:text-gray-300 mb-2"><span class="font-medium"><b>Mother's Name:</b></span> Monera Parvin (Housewife)</p>
+                    <p class="text-gray-700 dark:text-gray-300 mb-2"><span class="font-medium"><b>Siblings:</b></span> Engr Md. Monirul Islam (ECE), Engr S.M. Mominul Islam (EEE)</p>
+                    <p class="text-gray-700 dark:text-gray-300 mb-2"><span class="font-medium"><b>Date of Birth:</b></span> November 19, 1989</p>
+                    <p class="text-gray-700 dark:text-gray-300 mb-2"><span class="font-medium"><b>Gender:</b></span> Male</p>
+                    <p class="text-gray-700 dark:text-gray-300 mb-2"><span class="font-medium"><b>Marital Status:</b></span> Married</p>
+                    <p class="text-gray-700 dark:text-gray-300 mb-2"><span class="font-medium"><b>Wife's Name:</b></span> Sadika Shabnam (Doctor)</p>
+                    <p class="text-gray-700 dark:text-gray-300 mb-2"><span class="font-medium"><b>Children:</b></span> Sharish Ikfa </p>
+                    <p class="text-gray-700 dark:text-gray-300 mb-2"><span class="font-medium"><b>Nationality:</b></span> Bangladeshi</p>
+                    <p class="text-gray-700 dark:text-gray-300 mb-2"><span class="font-medium"><b>National ID No:</b></span> 4798519276121 (Old), 4601012513 (New)</p>
+                    <p class="text-gray-700 dark:text-gray-300 mb-2"><span class="font-medium"><b>Driving License No:</b></span> BN0011363CL001</p>
+                    <p class="text-gray-700 dark:text-gray-300 mb-2"><span class="font-medium"><b>TIN No:</b></span> 160419229681</p>
+                    <p class="text-gray-700 dark:text-gray-300 mb-2"><span class="font-medium"><b>Passport No:</b></span> BN0968028</p>
+                    <p class="text-gray-700 dark:text-gray-300 mb-2"><span class="font-medium"><b>BRP No: </b></span> RT7394338</p>
+					<p class="text-gray-700 dark:text-gray-300 mb-2"><span class="font-medium"><b>NI No:</b> </span> TH180785B</p>
+					<p class="text-gray-700 dark:text-gray-300 mb-2"><span class="font-medium"><b>IHS reference number:</b> </span>IHS163240738</p>
+					<p class="text-gray-700 dark:text-gray-300 mb-2"><span class="font-medium"><b>Right to Work or Share Code:</b>  </span> WPT 2X5 6YR</p>
+					<p class="text-gray-700 dark:text-gray-300 mb-2"><span class="font-medium"><b>UK VISA No:</b> </span> 021433945</p>
+					<p class="text-gray-700 dark:text-gray-300 mb-2"><span class="font-medium"><b>YAF No:</b> </span> 4852202</p>
+                </div>
+				<div class="card bg-gray-100 dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
                     <h3 class="text-2xl font-semibold mb-4 text-[var(--secondary)] dark:text-[var(--primary)]">Contact Details</h3>
-                    <p class="text-gray-700 dark:text-gray-300 mb-2"><i class="fas fa-envelope mr-2"></i> <a href="mailto:rashadul.oni@gmail.com" class="text-[var(--primary)] hover:underline">rashadul.oni@gmail.com</a></p>
-                    <p class="text-gray-700 dark:text-gray-300"><i class="fas fa-phone mr-2"></i> +88 01775555501</p>
+                    <p class="text-gray-700 dark:text-gray-300 mb-2"><i class="fas fa-envelope mr-2"></i> <a href="mailto:rashadul.oni@gmail.com" class="link-hover">rashadul.oni@gmail.com</a></p>
+                    <p class="text-gray-700 dark:text-gray-300"><i class="fas fa-phone mr-2"></i> +447464271942</p>
+					<br>
+					<br>
+					<h3 class="text-2xl font-semibold mb-4 text-[var(--secondary)] dark:text-[var(--primary)]">Address</h3>
+                    <p class="text-gray-700 dark:text-gray-300 mb-2"><i class="fas fa-map-marker-alt mr-2"></i> <b> Current Address: </b>29 Heathcote Road Porthmouth,UK Post Code: PO2 0JT</p>
+                    <p class="text-gray-700 dark:text-gray-300 mb-2"><i class="fas fa-map-marker-alt mr-2"></i> <b>Permanent Address: </b>16, National Boy’s School Road, Dalmil More, Khulna, Bangladesh</p>
+                    <p class="text-gray-700 dark:text-gray-300"><i class="fas fa-map-marker-alt mr-2"></i> <b>Parental Address:</b> C/O Late. Asaduzzaman Sardar, Village# Chapta, Upazila# Kashiani, Zilla# Gopalganj, District# Dhaka, Bangladesh</p>
                 </div>
-                <div class="card bg-gray-100 dark:bg-gray-800 p-8 rounded-xl animate-slide-in">
-                    <h3 class="text-2xl font-semibold mb-4 text-[var(--secondary)] dark:text-[var(--primary)]">Location</h3>
-                    <p class="text-gray-700 dark:text-gray-300"><i class="fas fa-map-marker-alt mr-2"></i> Khulna-9100, Bangladesh</p>
-                </div>
+				
             </div>
         </div>
     </section>
 
     <!-- Footer Section -->
     <footer class="bg-[var(--secondary)] text-white text-center py-8">
-        <p class="text-sm">© 2025 S.M. Rashadul Islam. All rights reserved.</p>
+        <p class="text-sm">© 2025 S M Rashadul Islam. All rights reserved.</p>
+        <p class="text-sm mt-2">I, S.M. Rashadul Islam, certify that all information provided is accurate and authentic to the best of my knowledge</p>
     </footer>
+
+    <!-- JavaScript for file handling -->
+    <script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+            return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+            if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+                try {
+                    var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                    var firstSheetName = workbook.SheetNames[0];
+                    var worksheet = workbook.Sheets[firstSheetName];
+                    var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                    var filteredData = jsonData.filter(row => row.some(filledCell));
+                    var headerRowIndex = filteredData.findIndex((row, index) =>
+                        row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                    );
+                    if (headerRowIndex === -1 || headerRowIndex > 25) {
+                        headerRowIndex = 0;
+                    }
+                    var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
+                    csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                    return csv;
+                } catch (e) {
+                    console.error(e);
+                    return "";
+                }
+            }
+            return gk_fileData[filename] || "";
+        }
+    </script>
 
     <!-- JavaScript for interactivity -->
     <script>
@@ -267,7 +938,6 @@
             document.body.classList.toggle('dark');
             modeToggle.classList.toggle('fa-moon');
             modeToggle.classList.toggle('fa-sun');
-            // Save preference to localStorage
             if (document.body.classList.contains('dark')) {
                 localStorage.setItem('theme', 'dark');
             } else {
@@ -290,7 +960,7 @@
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('visible');
-                    observer.unobserve(entry.target); // Stop observing once animated
+                    observer.unobserve(entry.target);
                 }
             });
         }, { threshold: 0.2 });
