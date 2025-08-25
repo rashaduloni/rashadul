@@ -81,14 +81,64 @@
             transform: translateY(-1px);
         }
         
-        /* Hero Section */
-        .hero {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            position: relative;
-            overflow: hidden;
-            min-height: 100vh;
+        /* Profile Image Styles */
+        .profile-image-container {
             display: flex;
+            justify-content: center;
             align-items: center;
+        }
+        
+        .profile-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            object-position: center;
+            border: 6px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+        
+        .profile-image::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            right: -8px;
+            bottom: -8px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1));
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .profile-image:hover {
+            transform: scale(1.05);
+            border-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4);
+        }
+        
+        .profile-image:hover::before {
+            opacity: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .profile-image {
+                width: 150px;
+                height: 150px;
+                border-width: 4px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .profile-image {
+                width: 120px;
+                height: 120px;
+                border-width: 3px;
+            }
         }
         
         .hero::before {
@@ -409,6 +459,9 @@
     <!-- Hero Section -->
     <header class="hero">
         <div class="hero-content container mx-auto px-6 text-center text-white">
+            <div class="profile-image-container mb-8 fade-in">
+                <img src="profile.jpg" alt="S M Rashadul Islam" class="profile-image">
+            </div>
             <h1 class="text-6xl md:text-7xl font-black mb-6 fade-in">S M Rashadul Islam</h1>
             <p class="text-xl md:text-2xl mb-8 font-light opacity-90 fade-in">Cyber Security Specialist | Network Architect | System Innovator</p>
             <div class="fade-in">
